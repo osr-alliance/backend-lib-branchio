@@ -92,7 +92,7 @@ func (b *branchio) UpdateLink(ctx context.Context, deeplink string, deepLinkProp
 	}
 	deepLinkMap["branch_key"] = b.key
 	deepLinkMap["branch_secret"] = b.secret
-	fmt.Println("MAP: ", deepLinkMap)
+
 	body, err := b.Put(ctx, deepLinkPath, deepLinkMap, queryMap)
 	if err != nil {
 		return "", err

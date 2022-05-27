@@ -105,13 +105,11 @@ func (b *branchio) Put(ctx context.Context, path string, body map[string]interfa
 }
 
 func (b *branchio) buildRequest(ctx context.Context, method string, path string, query map[string]interface{}, body map[string]interface{}) (*http.Request, error) {
-
 	//build body
 	var bodyReader io.Reader
 	var err error
 	if method == http.MethodPost || method == http.MethodPut {
 		bodyReader, err = b.buildBody(body)
-		//fmt.Printf("body: %v\n", body)
 		if err != nil {
 			return nil, fmt.Errorf("failed build body: %v", err)
 		}
@@ -158,8 +156,5 @@ func (b *branchio) structToMap(data interface{}) (map[string]interface{}, error)
 	}
 	mapData := make(map[string]interface{})
 	err = json.Unmarshal(dataBytes, &mapData)
-	if err != nil {
-		return nil, err
-	}
 	return mapData, nil
 }
