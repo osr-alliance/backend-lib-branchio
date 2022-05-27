@@ -35,18 +35,20 @@ func New(branchKey string, branchSecret string) Branchio {
 	}
 }
 
-func (b *branchio) CreateLink(ctx context.Context, deepLink *DeepLinkProperties, data *DeepLinkData, customData map[string]interface{}) (string, error) {
+func (b *branchio) CreateLink(ctx context.Context, deepLinkProperties *DeepLinkProperties, data *DeepLinkData, customData map[string]interface{}) (string, error) {
 	type UrlMessage struct {
 		Url string
 	}
 	var urlMsg UrlMessage
-	dataMap, _ := b.structToMap(data)
-	customDataMap := b.mergeMaps(dataMap, customData)
-	deepLink.Data = customDataMap
-	deepLinkMap, _ := b.structToMap(deepLink)
-	deepLinkMap["branch_key"] = b.key
 
-	body, err := b.Post(ctx, deepLinkPath, deepLinkMap)
+	deepLinkParams, err := b.buildParameters(deepLinkProperties, data, customData)
+	if err != nil {
+		return "", err
+	}
+
+	deepLinkParams["branch_key"] = b.key
+
+	body, err := b.Post(ctx, deepLinkPath, deepLinkParams)
 	if err != nil {
 		return "", err
 	}
@@ -83,17 +85,16 @@ func (b *branchio) UpdateLink(ctx context.Context, deeplink string, deepLinkProp
 	queryMap := map[string]interface{}{
 		"url": deeplink,
 	}
-	dataMap, _ := b.structToMap(data)
-	customDataMap := b.mergeMaps(dataMap, customData)
-	deepLinkProperties.Data = customDataMap
-	deepLinkMap, err := b.structToMap(deepLinkProperties)
-	if err != nil {
-		return "", fmt.Errorf("error parsing deepLinkProperties: %v\n", err)
-	}
-	deepLinkMap["branch_key"] = b.key
-	deepLinkMap["branch_secret"] = b.secret
 
-	body, err := b.Put(ctx, deepLinkPath, deepLinkMap, queryMap)
+	deepLinkParams, err := b.buildParameters(deepLinkProperties, data, customData)
+	if err != nil {
+		return "", err
+	}
+
+	deepLinkParams["branch_key"] = b.key
+	deepLinkParams["branch_secret"] = b.secret
+
+	body, err := b.Put(ctx, deepLinkPath, deepLinkParams, queryMap)
 	if err != nil {
 		return "", err
 	}
