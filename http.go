@@ -148,13 +148,3 @@ func (b *branchio) handleResponseError(bodyResp []byte) error {
 	}
 	return fmt.Errorf("response error, code: %v: %v", bodyError.Code, bodyError.Message)
 }
-
-func (b *branchio) structToMap(data interface{}) (map[string]interface{}, error) {
-	dataBytes, err := json.Marshal(data)
-	if err != nil {
-		return nil, err
-	}
-	mapData := make(map[string]interface{})
-	err = json.Unmarshal(dataBytes, &mapData)
-	return mapData, nil
-}
