@@ -43,7 +43,7 @@ func main() {
 		Stage:   "Email password sigup",
 		Type:     1,
 		Tags: []string{"test"},
-		Identity: "lucas@allianceapp.com",
+		Identity: "support@allianceapp.com",
 	}
 	data := &branchiolib.DeepLinkData{
 		DesktopUrl:    "http://allianceapp.com",
