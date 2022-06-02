@@ -6,7 +6,6 @@ import (
 	"encoding/json"
 	"fmt"
 	"io"
-	"io/ioutil"
 	"net/http"
 	"net/url"
 )
@@ -32,11 +31,10 @@ func (b *branchio) buildUri(path string, query map[string]interface{}) (*url.URL
 
 func (b *branchio) buildQueryParams(query map[string]interface{}) string {
 	q := url.Values{}
-	if query != nil {
-		for k, v := range query {
-			q.Set(k, fmt.Sprintf("%v", v))
-		}
+	for k, v := range query {
+		q.Set(k, fmt.Sprintf("%v", v))
 	}
+
 	return q.Encode()
 }
 
@@ -64,9 +62,13 @@ func (b *branchio) SendRequest(ctx context.Context, method string, path string, 
 
 func (b *branchio) Post(ctx context.Context, path string, body map[string]interface{}) ([]byte, error) {
 	resp, err := b.SendRequest(ctx, http.MethodPost, path, nil, body)
+	if err != nil {
+		return nil, fmt.Errorf("error sending request: %v", err)
+	}
+
 	bodyResp, err := b.readResponseBody(resp)
 	if err != nil {
-		return nil, fmt.Errorf("error reading response body: %v\n", err)
+		return nil, fmt.Errorf("error reading response body: %v", err)
 	}
 	if resp.StatusCode != http.StatusOK {
 		err = b.handleResponseError(bodyResp)
@@ -78,9 +80,13 @@ func (b *branchio) Post(ctx context.Context, path string, body map[string]interf
 
 func (b *branchio) Get(ctx context.Context, path string, query map[string]interface{}) ([]byte, error) {
 	resp, err := b.SendRequest(ctx, http.MethodGet, path, query, nil)
+	if err != nil {
+		return nil, fmt.Errorf("error sending request: %v", err)
+	}
+
 	bodyResp, err := b.readResponseBody(resp)
 	if err != nil {
-		return nil, fmt.Errorf("error reading response body: %v\n", err)
+		return nil, fmt.Errorf("error reading response body: %v", err)
 	}
 	if resp.StatusCode != http.StatusOK {
 		err = b.handleResponseError(bodyResp)
@@ -92,9 +98,13 @@ func (b *branchio) Get(ctx context.Context, path string, query map[string]interf
 
 func (b *branchio) Put(ctx context.Context, path string, body map[string]interface{}, query map[string]interface{}) ([]byte, error) {
 	resp, err := b.SendRequest(ctx, http.MethodPut, path, query, body)
+	if err != nil {
+		return nil, fmt.Errorf("error sending request: %v", err)
+	}
+
 	bodyResp, err := b.readResponseBody(resp)
 	if err != nil {
-		return nil, fmt.Errorf("error reading response body: %v\n", err)
+		return nil, fmt.Errorf("error reading response body: %v", err)
 	}
 	if resp.StatusCode != http.StatusOK {
 		err = b.handleResponseError(bodyResp)
@@ -132,7 +142,7 @@ func (b *branchio) buildRequest(ctx context.Context, method string, path string,
 func (b *branchio) readResponseBody(response *http.Response) ([]byte, error) {
 	defer response.Body.Close()
 
-	body, err := ioutil.ReadAll(response.Body)
+	body, err := io.ReadAll(response.Body)
 	if err != nil {
 		return nil, fmt.Errorf("failed read response body: %v", err)
 	}
