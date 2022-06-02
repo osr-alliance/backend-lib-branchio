@@ -11,6 +11,7 @@ type DeepLinkProperties struct {
 	Type     int                    `json:"type,omitempty"`
 	Tags     []string               `json:"tags,omitempty"`
 	Identity string                 `json:"identity,omitempty"`
+	Duration int                    `json:"duration,omitempty"`
 	Data     map[string]interface{} `json:"data"`
 }
 
@@ -39,6 +40,9 @@ func (b *branchio) structToMap(data interface{}) (map[string]interface{}, error)
 	}
 	mapData := make(map[string]interface{})
 	err = json.Unmarshal(dataBytes, &mapData)
+	if err != nil {
+		return nil, err
+	}
 	return mapData, nil
 }
 
